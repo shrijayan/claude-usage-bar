@@ -1,16 +1,36 @@
 # claude-usage-bar
 
-A tiny Claude Code status line with **bars** for your 5-hour and weekly usage limits, plus a countdown until your **prompt cache** goes cold.
+Shows your Claude Code **5-hour** and **weekly** usage limits as bars, plus a countdown until your **prompt cache** goes cold.
 
 ```
-5h ████░░░░░░ 42% ↻2h1m  │  wk █████████░ 91% ↻3d11h  │  cache ███████░░░ 3m32s
+5h ━━━━━━━━━━ 5% ↻1h23m  ·  week ━━━━━━━━━━ 42% ↻22h53m  ·  cache ━━━━━━━━━━ 48m31s
 ```
 
-- Green / yellow / red at 70% and 90%
-- `↻` = time until that window resets
-- `cache` counts down from your last Claude reply (prompt cache TTL); turns `cold` when expired, so you know whether the next message will be a cheap cache hit
+- Green / yellow / red at 70% and 90%; `↻` = time until that window resets
+- `cache` counts down from Claude's last reply and shows `cold` when expired, so you know if the next message is a cheap cache hit
 
-## Install
+Two flavours:
+
+## Band above the prompt (recommended)
+
+A Claude Code plugin. In a Claude Code session:
+
+```
+/plugin install usage-band --marketplace shrijayan/claude-usage-bar
+```
+
+Answer `y` to add the marketplace, pick a scope, done. Or from a shell:
+
+```sh
+claude plugin install usage-band --marketplace shrijayan/claude-usage-bar
+```
+
+Cache TTL defaults to 60 minutes; switch with `/cache-ttl 5` or `/cache-ttl 60`.
+
+**Updating:** `/plugin marketplace update claude-usage-bar`, then restart Claude Code.
+
+## Status line (alternative)
+
 
 Needs `jq` and `bash`.
 
@@ -24,7 +44,7 @@ Restart Claude Code. Your previous status line is backed up and restored on unin
 curl -fsSL https://raw.githubusercontent.com/shrijayan/claude-usage-bar/main/install.sh | bash -s -- --uninstall
 ```
 
-## Config
+### Status line config
 
 Set env vars before launching `claude`:
 

@@ -31,7 +31,7 @@ Set env vars before launching `claude`:
 | Var | Default | |
 |---|---|---|
 | `CUB_WIDTH` | `10` | bar width in characters |
-| `CUB_CACHE_TTL` | `300` | cache TTL in seconds (use `3600` if you use 1-hour caching) |
+| `CUB_CACHE_TTL` | auto | cache TTL in seconds; auto-detected (1h or 5m) from the last cache write, falls back to `300` |
 
 ## Notes
 

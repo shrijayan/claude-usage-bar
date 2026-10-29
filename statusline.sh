@@ -1,19 +1,25 @@
 #!/usr/bin/env bash
 # claude-usage-bar: 5h / weekly usage bars + prompt-cache countdown for Claude Code.
-# Env: CUB_WIDTH (bar width, default 10), CUB_CACHE_TTL (seconds, default 300).
+# Env: CUB_WIDTH (bar width, default 10), CUB_CACHE_TTL (seconds; default auto-detect, else 300).
 input=$(cat)
 W=${CUB_WIDTH:-10}
 TTL=${CUB_CACHE_TTL:-300}
 NOW=$(date +%s)
 
 # Last assistant message time from the transcript = last cache write/read.
+# TTL is auto-detected from the most recent cache write (1h vs 5m) unless CUB_CACHE_TTL is set.
 tp=$(jq -r '.transcript_path // empty' <<<"$input")
 last=0
 if [ -n "$tp" ] && [ -f "$tp" ]; then
-  last=$(tail -n 200 "$tp" | jq -rs '
-    [.[] | select(.type=="assistant" and .timestamp) | .timestamp] | last // empty
-    | sub("\\.[0-9]+";"") | fromdateiso8601' 2>/dev/null || echo 0)
+  read -r last ttl_seen < <(tail -n 400 "$tp" | jq -rs '
+    [.[] | select(.type=="assistant" and .timestamp)] as $a
+    | ($a | last | .timestamp // empty | sub("\\.[0-9]+";"") | fromdateiso8601) as $t
+    | ([$a[] | .message.usage.cache_creation // empty
+        | if (.ephemeral_1h_input_tokens // 0) > 0 then 3600
+          elif (.ephemeral_5m_input_tokens // 0) > 0 then 300 else empty end] | last // 0) as $ttl
+    | "\($t) \($ttl)"' 2>/dev/null) || true
 fi
+if [ -z "${CUB_CACHE_TTL:-}" ] && [ "${ttl_seen:-0}" -gt 0 ] 2>/dev/null; then TTL=$ttl_seen; fi
 
 jq -rj --argjson w "$W" --argjson ttl "$TTL" --argjson now "$NOW" --argjson last "${last:-0}" '
   def color(p): if p >= 90 then "\u001b[31m" elif p >= 70 then "\u001b[33m" else "\u001b[32m" end;

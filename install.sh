@@ -25,8 +25,12 @@ if [ "${1:-}" = "--uninstall" ]; then
   echo "claude-usage-bar removed; previous status line restored."; exit 0
 fi
 
-src="$(cd "$(dirname "${BASH_SOURCE[0]:-.}")" 2>/dev/null && pwd)/statusline.sh"
-if [ -f "$src" ]; then cp "$src" "$SCRIPT"; else curl -fsSL "$REPO_RAW/statusline.sh" -o "$SCRIPT"; fi
+# Use the bundled copy only when run from a checkout; under `curl | bash` always download.
+src=""
+if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then
+  src="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/statusline.sh"
+fi
+if [ -n "$src" ] && [ -f "$src" ]; then cp "$src" "$SCRIPT"; else curl -fsSL "$REPO_RAW/statusline.sh" -o "$SCRIPT"; fi
 chmod +x "$SCRIPT"
 
 [ -f "$BACKUP" ] || cp "$SETTINGS" "$BACKUP"

@@ -1,1 +1,1 @@
-{ "name": "usage-band", "version": "0.1.0", "description": "Band above the prompt with 5h / weekly usage bars and a prompt-cache countdown", "author": { "name": "shrijayan" }, "license": "MIT", "types": "./types/index.d.ts" }
+{ "name": "usage-band", "version": "0.2.0", "description": "Band above the prompt with 5h / weekly usage bars and a prompt-cache countdown", "author": { "name": "shrijayan" }, "license": "MIT", "types": "./types/index.d.ts" }

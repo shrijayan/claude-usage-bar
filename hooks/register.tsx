@@ -10,7 +10,24 @@ const now = atom({ plugin: 'usage-band', key: 'now' } as const, 0)
 
 const WIDTH = 10
 
-const color = (pct: number) => (pct >= 90 ? 'red' : pct >= 70 ? 'yellow' : 'green')
+type RGB = [number, number, number]
+const hex = ([r, g, b]: RGB) => '#' + [r, g, b].map(v => Math.round(v).toString(16).padStart(2, '0')).join('')
+// Blend smoothly through the stops as t goes 0 → 1.
+const ramp = (stops: RGB[], t: number) => {
+  const x = Math.min(1, Math.max(0, t)) * (stops.length - 1)
+  const i = Math.min(stops.length - 2, Math.floor(x))
+  const f = x - i
+  const a = stops[i]!
+  const b = stops[i + 1]!
+  return hex([0, 1, 2].map(k => a[k]! + (b[k]! - a[k]!) * f) as RGB)
+}
+const GREEN: RGB = [80, 200, 120]
+const YELLOW: RGB = [230, 200, 60]
+const BLUE: RGB = [80, 170, 230]
+const RED: RGB = [235, 80, 80]
+
+// Usage: green → yellow → red as it fills.
+const color = (pct: number) => ramp([GREEN, YELLOW, RED], pct / 100)
 
 const dur = (ms: number) => {
   const s = Math.max(0, Math.floor(ms / 1000))
@@ -94,7 +111,8 @@ export const register: Register = on => {
 
     if (last > 0) {
       const left = last + ttl - t
-      const fill = left < 60_000 ? 'red' : left < ttl / 5 ? 'yellow' : 'cyan'
+      // Cache: blue when fresh → red as it runs out.
+      const fill = ramp([RED, BLUE], left / ttl)
       items.push(
         <Text key="cache">
           <Text bold>cache </Text>

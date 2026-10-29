@@ -6,7 +6,7 @@ Shows your Claude Code **5-hour** and **weekly** usage limits as bars, plus a co
 5h ━━━━━━━━━━ 5% ↻1h23m  ·  week ━━━━━━━━━━ 42% ↻22h53m  ·  cache ━━━━━━━━━━ 48m31s
 ```
 
-- Green / yellow / red at 70% and 90%; `↻` = time until that window resets
+- Colours blend green → yellow → red as usage rises, and blue → red as the cache runs out; `↻` = time until that window resets
 - `cache` counts down from Claude's last reply and shows `cold` when expired, so you know if the next message is a cheap cache hit
 
 Two flavours:
